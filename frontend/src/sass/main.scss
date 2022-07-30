@@ -1,10 +1,9 @@
-@import
-  'abstracts/variables',
-  'abstracts/mixins';
+@import "abstracts/variables", "abstracts/mixins";
 
-@import
-  'base/typography';
+@import "base/reset", "base/typography";
 
-@import
-  'layout/header',
-  'layout/footer';
+@import "components/calendar";
+
+@import "layout/header", "layout/footer";
+
+@import "pages/app";
