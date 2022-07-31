@@ -44,20 +44,23 @@ const App = () => {
 
         setIsExtracting(true)
 
+        const blobAPICall = await fetch(mediaBlobUrl)
+        const blob = await blobAPICall.blob()
+        const audiofile = new File([blob], "audiofile.mp4", { type: "audio/mp4" })
+        const formData = new FormData()
+        formData.append("file", audiofile)
+
         if (mediaBlobUrl) {
             const response = await fetch(`${process.env.REACT_APP_BASE_BACKEND_URL}/extract`, {
                 method: 'POST',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    url: mediaBlobUrl
-                })
+                body: formData
             })
 
             const responseJSON = await response.json()
-            console.log("response", responseJSON)
+
+            if (responseJSON.status === 200) {
+                alert('Penseive successfully extracted')
+            }
 
             if (isMounted.current) {
                 setIsExtracting(false)
