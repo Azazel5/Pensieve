@@ -1,8 +1,8 @@
 // Default packages
-const fs = require('fs')
+import fs from 'fs'
 
 // Installed packages
-const fetch = require('node-fetch')
+import fetch from 'node-fetch'
 
 async function writeBlobToFile(blob) {
     // Validate that the blob sent is of type audio/* and everything is A-OK, 
@@ -11,13 +11,11 @@ async function writeBlobToFile(blob) {
 
     fs.writeFile('penseive.mp4', blobBuffer, err => {
         if (err) {
-            return false
+            throw new Error('Something went wrong with extracting penseive...')
         }
     })
-
-    return true
 }
 
-module.exports = {
+export {
     writeBlobToFile
 }

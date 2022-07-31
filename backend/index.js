@@ -1,11 +1,12 @@
 // Installed packages
-const express = require('express')
-const cors = require('cors')
-const bodyParser = require('body-parser')
-const multer = require('multer')
+import express from 'express'
+import cors from 'cors'
+import bodyParser from 'body-parser'
+import multer from 'multer'
+import { fileTypeFromStream } from 'file-type'
 
 // Custom functions/modules
-const { writeBlobToFile } = require('./utils/fileHandling/fileHandling')
+import { writeBlobToFile } from './utils/fileHandling/fileHandling.js'
 
 const app = express()
 const port = 8000
@@ -26,19 +27,30 @@ app.use(express.static('public'))
 
 // Routes
 app.post('/extract', upload.single('file'), (req, res) => {
-    // Make sure req file buffer buffer exists else return from here
-    const extractedMemoryBlobUrl = req.file.buffer.buffer
-    const response = writeBlobToFile(extractedMemoryBlobUrl)
+    const extractedMemoryBlobUrl = req?.file?.buffer?.buffer
+    let statusCode
+    let message
 
-    if (response) {
-        return res.status(200).send({
-            message: 'Successfully extracted pensieve!'
+    if (!extractedMemoryBlobUrl) {
+        return res.status(405).send({
+            message: 'Pensieve file buffer not present'
         })
     }
 
-    else {
-        return res.status(500).send({
-            message: 'Something went wrong extracting pensieve...'
+    try {
+        writeBlobToFile(extractedMemoryBlobUrl)
+        statusCode = 200
+        message = 'Successully extracted pensieve!'
+    }
+
+    catch (error) {
+        statusCode = 500
+        message = error.message
+    }
+
+    finally {
+        return res.status(statusCode).send({
+            message
         })
     }
 })
