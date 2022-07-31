@@ -54,10 +54,7 @@ const App = () => {
             })
 
             const responseJSON = await response.json()
-
-            if (response.status === 200) {
-                alert(responseJSON.message)
-            }
+            alert(responseJSON.message)
 
             setIsExtracting(false)
             setBlob()

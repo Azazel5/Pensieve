@@ -1,9 +1,10 @@
+// Default packages
+import bodyParser from 'body-parser'
+
 // Installed packages
 import express from 'express'
 import cors from 'cors'
-import bodyParser from 'body-parser'
 import multer from 'multer'
-import { fileTypeFromStream } from 'file-type'
 
 // Custom functions/modules
 import { writeBlobToFile } from './utils/fileHandling/fileHandling.js'
@@ -26,37 +27,18 @@ app.use(express.urlencoded({ extended: true }))
 app.use(express.static('public'))
 
 // Routes
-app.post('/extract', upload.single('file'), (req, res) => {
-    const extractedMemoryBlobUrl = req?.file?.buffer?.buffer
-    let statusCode
-    let message
-
-    if (!extractedMemoryBlobUrl) {
-        return res.status(405).send({
-            message: 'Pensieve file buffer not present'
-        })
-    }
-
+app.post('/extract', upload.single('file'), async (req, res) => {
     try {
-        writeBlobToFile(extractedMemoryBlobUrl)
-        statusCode = 200
-        message = 'Successully extracted pensieve!'
+        var [statusCode, message] = await writeBlobToFile(req)
     }
 
     catch (error) {
-        statusCode = 500
-        message = error.message
+        var [statusCode, message] = error
     }
 
-    finally {
-        return res.status(statusCode).send({
-            message
-        })
-    }
-})
-
-app.get('/view', (req, res) => {
-
+    return res.status(statusCode).send({
+        message
+    })
 })
 
 app.listen(port, () => {
