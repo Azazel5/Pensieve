@@ -5,11 +5,7 @@ const bodyParser = require('body-parser')
 const multer = require('multer')
 
 // Custom functions/modules
-<<<<<<< HEAD
-const { convertBlobUrlToFile } = require('./utils/fileHandling/fileHandling')
-=======
 const { writeBlobToFile } = require('./utils/fileHandling/fileHandling')
->>>>>>> feature_save-audio-backend
 
 const app = express()
 const port = 8000
