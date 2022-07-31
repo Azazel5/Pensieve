@@ -5,7 +5,7 @@ const bodyParser = require('body-parser')
 const multer = require('multer')
 
 // Custom functions/modules
-const { convertBlobUrlToFile } = require('./utils/fileHandling/fileHandling')
+const { writeBlobToFile } = require('./utils/fileHandling/fileHandling')
 
 const app = express()
 const port = 8000
@@ -21,16 +21,14 @@ app.use(cors())
 
 // Body parsers
 app.use(express.json())
-app.use(
-    bodyParser.raw({ limit: '50mb', type: ['audio/*'] })
-)
 app.use(express.urlencoded({ extended: true }))
 app.use(express.static('public'))
 
 // Routes
 app.post('/extract', upload.single('file'), (req, res) => {
+    // Make sure req file buffer buffer exists else return from here
     const extractedMemoryBlobUrl = req.file.buffer.buffer
-    const response = convertBlobUrlToFile(extractedMemoryBlobUrl)
+    const response = writeBlobToFile(extractedMemoryBlobUrl)
 
     if (response) {
         return res.status(200).send({

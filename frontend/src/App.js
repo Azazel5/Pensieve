@@ -1,5 +1,5 @@
 // React
-import { useCallback, useState, useRef, useEffect } from 'react'
+import { useCallback, useState } from 'react'
 
 // 3rd party
 import Calendar from 'react-calendar'
@@ -10,15 +10,14 @@ const App = () => {
     // Hooks
     const [clickedDay, setClickedDay] = useState()
     const [extracting, setIsExtracting] = useState(false)
-    const isMounted = useRef(true)
+    const [blob, setBlob] = useState()
     const { status, startRecording, stopRecording, mediaBlobUrl } =
-        useReactMediaRecorder({ video: false });
-
-    useEffect(() => {
-        return () => {
-            isMounted.current = false
-        }
-    }, [])
+        useReactMediaRecorder({
+            video: false,
+            onStop: (blobUrl, blob) => {
+                setBlob(blob)
+            }
+        })
 
     // Normal Variables
     const stoppedStatuses = ['idle', 'stopped']
@@ -40,12 +39,10 @@ const App = () => {
     }
 
     const sendToServerHandler = useCallback(async () => {
-        if (extracting) return
+        if (extracting || !blob) return
 
         setIsExtracting(true)
 
-        const blobAPICall = await fetch(mediaBlobUrl)
-        const blob = await blobAPICall.blob()
         const audiofile = new File([blob], "audiofile.mp4", { type: "audio/mp4" })
         const formData = new FormData()
         formData.append("file", audiofile)
@@ -58,15 +55,14 @@ const App = () => {
 
             const responseJSON = await response.json()
 
-            if (responseJSON.status === 200) {
-                alert('Penseive successfully extracted')
+            if (response.status === 200) {
+                alert(responseJSON.message)
             }
 
-            if (isMounted.current) {
-                setIsExtracting(false)
-            }
+            setIsExtracting(false)
+            setBlob()
         }
-    }, [extracting, mediaBlobUrl])
+    }, [extracting, mediaBlobUrl, blob])
 
     return (
         <div className='app'>
@@ -85,7 +81,7 @@ const App = () => {
                     </button>
                 </div>
 
-                {mediaBlobUrl && <button onClick={sendToServerHandler}>Send to server</button>}
+                {blob && <button onClick={sendToServerHandler}>Send to server</button>}
             </div>
         </div>
     );
