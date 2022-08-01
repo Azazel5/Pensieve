@@ -5,19 +5,37 @@ import fs from 'fs'
 import fetch from 'node-fetch'
 import { fileTypeFromBuffer } from 'file-type'
 
+async function validateFileType(file) {
+    // Validate the file/field names and mimetype
+    // Also use the file-type library to check the file magic bytes to make sure
+    // it matches a video/webm type which is returned by react-media-recorder
+
+    const { ext, mime } = await fileTypeFromBuffer(file.buffer.buffer)
+    const { fieldname, mimetype, originalname } = file
+    return (
+        ext === 'webm' && mime === 'video/webm' && fieldname === 'file' &&
+        originalname === 'audiofile.mp4' && (mimetype === 'audio/mp4' || mimetype === 'video/mp4')
+    )
+}
+
 async function writeBlobToFile(req) {
-    // Validate that the blob sent is of type audio/* and everything is A-OK, 
-    // the limits are respected and all before proceeding to write to file
+    // Get blob from req.file. If this doesn't exist, return straight away
+    // Validate the blob. If validation doesn't pass return straight away
+    // Convert blob to Buffer and write to file system
+    // If any error thrown, return a 500 status code
+
     try {
         const blob = req?.file?.buffer?.buffer
 
         if (!blob) {
-            return [405, 'Pensieve file buffer not present']
+            return [400, 'Pensieve file buffer not present']
         }
 
-        const fileType = await fileTypeFromBuffer(blob)
-        const blobBuffer = Buffer.from(blob)
+        if (!await validateFileType(req.file)) {
+            return [400, 'Incorrect pensieve file buffer']
+        }
 
+        const blobBuffer = Buffer.from(blob)
         fs.writeFile('pensieve.mp4', blobBuffer, err => {
             if (err) {
                 throw err

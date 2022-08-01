@@ -39,6 +39,9 @@ const App = () => {
     }
 
     const sendToServerHandler = useCallback(async () => {
+        // Asychronously send API call to backend on click of button
+        // Append the blob into a file and send as formData for the server to parse
+
         if (extracting || !blob) return
 
         setIsExtracting(true)
