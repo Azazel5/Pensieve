@@ -1,3 +1,5 @@
+require('dotenv').config()
+
 // Default packages
 import bodyParser from 'body-parser'
 

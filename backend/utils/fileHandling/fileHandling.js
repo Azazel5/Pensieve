@@ -5,6 +5,9 @@ import fs from 'fs'
 import fetch from 'node-fetch'
 import { fileTypeFromBuffer } from 'file-type'
 
+// Custom packages
+import { client } from '../mongoDB/connection'
+
 async function validateFileType(file) {
     // Validate the file/field names and mimetype
     // Also use the file-type library to check the file magic bytes to make sure
@@ -36,12 +39,12 @@ async function writeBlobToFile(req) {
         }
 
         const blobBuffer = Buffer.from(blob)
-        fs.writeFile('pensieve.mp4', blobBuffer, err => {
-            if (err) {
-                throw err
-            }
-        })
-
+        // fs.writeFile('pensieve.mp4', blobBuffer, err => {
+        //     if (err) {
+        //         throw err
+        //     }
+        // })
+        
         return [200, 'Successully extracted pensieve!']
     }
 
