@@ -51,7 +51,7 @@ const App = () => {
         formData.append("file", audiofile)
 
         if (mediaBlobUrl) {
-            const response = await fetch(`${process.env.REACT_APP_BASE_BACKEND_URL}/extract`, {
+            const response = await fetch(`${process.env.REACT_APP_BASE_BACKEND_URL}/pensieve/extract`, {
                 method: 'POST',
                 body: formData
             })
